@@ -1,6 +1,7 @@
-streamlit==1.41.1
-speechbrain==1.0.3
-transformers==4.47.1
-torch==2.4.1
-torchaudio==2.4.1
-torchaudio==2.4.1
+sentence-transformers==4.1.0
+speechbrain @ git+https://github.com/speechbrain/speechbrain.git@264b642d7820547f02ae25cba028a4ae96f0e88f
+streamlit==1.40.1
+torch==2.8.0
+torchaudio==2.8.0
+torchviz==0.0.3
+transformers==4.57.3
