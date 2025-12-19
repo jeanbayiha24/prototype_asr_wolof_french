@@ -1,4 +1,3 @@
-
 import streamlit as st
 import os
 import time
@@ -61,6 +60,7 @@ else:
 tab1, tab2 = st.tabs(["Enregistrement micro", "Upload fichier audio"])
 
 transcription = None
+audio_path_play = None #pour pouvoir ecouter l'audio
 
 def transcribe_file(temp_path, model_type):
     try:
@@ -98,10 +98,15 @@ with tab1:
         with open(temp_path, "wb") as f:
             f.write(audio.getvalue())
         
+        #afficher l'audio pour permettre de l'ecouter
+        st.audio(temp_path, format="audio/wav")
+
         #transcription
         transcription = transcribe_file(temp_path, model_type)
-        
-        os.remove(temp_path)
+        #On garde le path pour l'ecoute
+        audio_path_play = temp_path
+    else:
+        audio_path_play = None
 
 #tab2 : upload fichier audio
 with tab2:
@@ -111,9 +116,15 @@ with tab2:
         with open(temp_path, "wb") as f:
             f.write(uploaded_file.getvalue())
         
-        transcription =transcribe_file(temp_path, model_type)
-        
-        os.remove(temp_path)
+        #afficher l'audio pour permettre de l'ecouter
+        st.audio(temp_path, format="audio/wav")
+
+
+        transcription = transcribe_file(temp_path, model_type)
+        #On garde le path pour l'ecoute
+        audio_path_play = temp_path
+    else:
+        audio_path_play = None
 
 
 #On garde l'historique des transcriptions
@@ -124,6 +135,14 @@ if transcription:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     model_label = MODELS[selected_model]
     st.session_state.history.append(f"{timestamp} | {model_label} : {transcription}")
+    
+    #supprimer le fichier temporaire pour ne pas surcharger le stockage
+    if audio_path_play and os.path.exists(audio_path_play):
+        try:
+            os.remove(audio_path_play)
+        except Exception as e:
+            pass
+
 
 st.subheader("Historique des transcriptions")#les 10 dernieres transcriptions
 for item in st.session_state.history[-10:]:
