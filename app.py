@@ -36,7 +36,7 @@ def load_whisper():
     model.to("cuda" if torch.cuda.is_available() else "cpu")
     return processor, model
 
-st.title("Test Proboutik ASR Wolof – (SpeechBrain & Whisper")
+st.title("Test ASR Wolof – (SpeechBrain & Whisper fine-tuned)")
 
 #selection modele
 selected_model = st.radio("Choisis le modèle ASR :", 
