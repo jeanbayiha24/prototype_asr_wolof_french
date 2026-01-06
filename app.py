@@ -10,9 +10,11 @@ import torchaudio.transforms as T
 # Import Whisper
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 #from langchain_ollama import ChatOllama
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
+#On save le model en local a la 1ere execution
 SAVEDIR = "pretrained_models/asr-wav2vec2-dvoice-wolof"
-# Modèles
+# Modèles dispo
 MODELS = {
     "speechbrain/asr-wav2vec2-dvoice-wolof": "SpeechBrain Wav2Vec2-DVoice",
     "dofbi/wolof-asr": "Whisper-small fine-tuné Wolof"
@@ -20,7 +22,7 @@ MODELS = {
 
 
 #load the wolof asr speechbrain model
-@st.cache_resource
+@st.cache_resource #mettre en cache le modele pour ne plus le recharger a chaque fois
 def load_speechbrain():
     return EncoderASR.from_hparams(
         source= "speechbrain/asr-wav2vec2-dvoice-wolof",
@@ -28,6 +30,7 @@ def load_speechbrain():
         run_opts={"device": "cuda" if torch.cuda.is_available() else "cpu"}
     )
 
+#load the fine-tuned whisper
 @st.cache_resource
 def load_whisper():
     model_name = "dofbi/wolof-asr"
@@ -36,7 +39,7 @@ def load_whisper():
     model.to("cuda" if torch.cuda.is_available() else "cpu")
     return processor, model
 
-st.title("Test ASR Wolof – (SpeechBrain & Whisper fine-tuned)")
+st.title("Test Proboutik ASR Wolof (SpeechBrain & Whisper) & Traduction Wolof-Français")
 
 #selection modele
 selected_model = st.radio("Choisis le modèle ASR :", 
@@ -54,6 +57,30 @@ else:
     whisper_processor, whisper_model = load_whisper()
     model_type = "whisper"
     st.info("Modèle chargé : Whisper-small fine-tuné Wolof")
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+#checkpoint du nllb pour la traduction
+checkpoint= "galsenai/wolofToFrenchTranslator_nllb"
+
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+#galsenai translation model
+translator_model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint).to(device)
+
+@st.cache_resource
+def translate(text, lang):
+    if lang.lower() == "wo":
+        prefix = "translate Wolof to French: "
+    elif lang.lower() == "fr":
+        prefix = "translate French to Wolof: "
+    else:
+        raise ValueError("Invalid language code")
+    inputs = tokenizer(prefix + text, return_tensors="pt").to(device)
+    translated_tokens = translator_model.generate(**inputs, max_length=30)
+    return tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+
+
 
 
 #Onglets pour les methodes de recuperation de l'audio
@@ -126,15 +153,21 @@ with tab2:
     else:
         audio_path_play = None
 
+#On traduit la transcription si elle existe
+traduction = None
+if transcription:
+    traduction = translate(transcription, lang="wo")
+    st.success(f"Traduction français : {traduction}")
+
 
 #On garde l'historique des transcriptions
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-if transcription:
+if transcription and traduction:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     model_label = MODELS[selected_model]
-    st.session_state.history.append(f"{timestamp} | {model_label} : {transcription}")
+    st.session_state.history.append(f"{timestamp} | {model_label} : {transcription} -> {traduction}")
     
     #supprimer le fichier temporaire pour ne pas surcharger le stockage
     if audio_path_play and os.path.exists(audio_path_play):
