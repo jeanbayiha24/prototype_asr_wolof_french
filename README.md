@@ -11,10 +11,10 @@ A simple **Streamlit web application** that allows you to:
 
 ### Speech Recognition (ASR)
 
-| Model on HuggingFace                          | Description                                      | Type       | Speed / Accuracy (approx.)         |
-|-----------------------------------------------|--------------------------------------------------|------------|------------------------------------|
-| `speechbrain/asr-wav2vec2-dvoice-wolof`       | Wav2Vec2 + CTC fine-tuned on DVoice corpus       | CTC        | Faster ∙ Good on clean speech      |
-| `dofbi/wolof-asr`                             | Whisper-small strongly fine-tuned on Wolof       | Transformer| Slower ∙ Currently best accuracy   |
+| Model on HuggingFace                          | Description                                      | Type       | 
+|-----------------------------------------------|--------------------------------------------------|------------|
+| `speechbrain/asr-wav2vec2-dvoice-wolof`       | Wav2Vec2 + CTC fine-tuned on DVoice corpus       | CTC        | 
+| `dofbi/wolof-asr`                             | Whisper-small strongly fine-tuned on Wolof       | Transformer| 
 
 ### Translation (Wolof ↔ French)
 
@@ -43,7 +43,7 @@ python -m venv venv
 source venv/bin/activate          # Linux/Mac
 # or venv\Scripts\activate        # Windows
 
-or use a conda virtual environment
+#or use a conda virtual environment
 
 pip install -r requirements.txt
 
