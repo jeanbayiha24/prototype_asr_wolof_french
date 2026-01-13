@@ -1,7 +1,9 @@
-sentence-transformers==4.1.0
-speechbrain @ git+https://github.com/speechbrain/speechbrain.git@264b642d7820547f02ae25cba028a4ae96f0e88f
-streamlit==1.40.1
-torch==2.8.0
-torchaudio==2.8.0
-torchviz==0.0.3
-transformers==4.57.3
+numpy==1.25.2
+torch==2.2.2
+torchaudio==2.2.2
+transformers==4.40.2
+accelerate
+speechbrain
+soundfile
+librosa
+streamlit
