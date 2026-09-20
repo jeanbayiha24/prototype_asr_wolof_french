@@ -25,6 +25,11 @@ A simple **Streamlit web application** that allows you to:
 
 > The translation model was fine-tuned by **GalsenAI** using manually aligned parallel corpora, Common Voice, Wikipedia, administrative documents, and data collected via LinguaSprint Africa.
 
+
+## Project architecture
+
+![Architecture du prototype ASR Wolof-French](prototype_asr_wolof_french.png)
+
 ## Features
 
 - Microphone recording directly in browser  
